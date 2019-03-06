@@ -4,6 +4,7 @@ Functions for predicting the output
 import time
 import numpy as np
 from preprocessing import json_reader
+from sklearn.metrics import f1_score
 
 def predictClass (Phi, Theta, dictionary, doc):
     """
@@ -95,3 +96,17 @@ def predictionArray (Phi, Theta, testset, dictionary, count=1000):
         
     print ("Time Taken: ", time.time() - tick)
     return (ratings, predictions)
+
+
+def F1scores (Phi, Theta, testset, dictionary, count=1000):
+    tick = time.time()
+
+    (ratings, predictions) = predictionArray (Phi, Theta, testset, dictionary, count)
+    F1_scores = f1_score(ratings, predictions, average=None)
+    macroF1 = f1_score(ratings, predictions, average='macro')
+
+    print ("Class   F1 Score")
+    for c in range(0, 5):
+        print ("  %d       %.3f" % (c+1, F1_scores[c]))
+    print ("Macro F1 Score: %.3f" % (macroF1))
+    print ("Time taken: ", time.time() - tick)

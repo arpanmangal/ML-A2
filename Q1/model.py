@@ -8,7 +8,7 @@ import time
 import pickle
 import numpy as np
 from preprocessing import json_reader, loadVocab
-from prediction import actualPredictions, randomPredictions, majorityPrediction
+from prediction import actualPredictions, randomPredictions, majorityPrediction, F1scores
 from plot import plotConfusionMatrix
 
 def computePHI (trainset, count=1000):
@@ -65,7 +65,7 @@ def computeTHETA (trainset, dictionary, count=1000, stemming=False):
     return Theta
 
 
-def saveAndLoadModel (mode, PHI=None, THETA=None):
+def saveAndLoadModel (mode, PHI=None, THETA=None, modelName='Q1/models/NBmodel.pickle'):
     """
     0 for saving the model
     1 for loading the model
@@ -73,10 +73,10 @@ def saveAndLoadModel (mode, PHI=None, THETA=None):
 
     if (mode == 0):
         model = (PHI, THETA)
-        with open('NBmodel.pickle', 'wb') as handle:
+        with open(modelName, 'wb') as handle:
             pickle.dump(model, handle, protocol=pickle.HIGHEST_PROTOCOL)
     else:
-        with open('NBmodel.pickle', 'rb') as handle:
+        with open(modelName, 'rb') as handle:
             (PHI, THETA) = pickle.load(handle)
         return (PHI, THETA)
 
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     trainset = sys.argv[1]
     testset = sys.argv[2]
     part = sys.argv[3]
-    count = 1000 # Upper limit on number of examples to consider
+    count = 2000 # Upper limit on number of examples to consider
 
     if (part == 'a'):
         # Implement NB on smaller data
@@ -98,7 +98,7 @@ if __name__ == '__main__':
         THETA = computeTHETA (trainset, dictionary, count, False)
         actualPredictions(PHI, THETA, trainset, dictionary, count, accuracyLabel="Training Accuracy: ")
         actualPredictions(PHI, THETA, testset, dictionary, count, accuracyLabel="Test Accuracy: ")
-        saveAndLoadModel (0, PHI, THETA)
+        saveAndLoadModel (0, PHI, THETA, modelName='Q1/models/NBsimple.pickle')
         exit (0)
 
     if (part == 'b'):
@@ -110,6 +110,22 @@ if __name__ == '__main__':
     if (part == 'c'):
         # Plot the confusion matrix
         dictionary = loadVocab('unigramVocab.pickle')
-        (PHI, THETA) = saveAndLoadModel (1)
+        (PHI, THETA) = saveAndLoadModel (1, modelName='Q1/models/NBsimple.pickle')
         plotConfusionMatrix (PHI, THETA, testset, dictionary, count)
         exit(0)
+
+    if (part == 'd'):
+        # Implement NB on smaller data
+        dictionary = loadVocab('stemmedVocab.pickle')
+        PHI = computePHI(trainset, count)
+        THETA = computeTHETA (trainset, dictionary, count, True)
+        actualPredictions(PHI, THETA, trainset, dictionary, count, accuracyLabel="Training Accuracy: ")
+        actualPredictions(PHI, THETA, testset, dictionary, count, accuracyLabel="Test Accuracy: ")
+        saveAndLoadModel (0, PHI, THETA, modelName='Q1/models/NBstemmed.pickle')
+        exit (0)
+
+    if (part == 'f'):
+        # Report F1-scores
+        dictionary = loadVocab('unigramVocab.pickle')
+        (PHI, THETA) = saveAndLoadModel (1)
+        F1scores (PHI, THETA, testset, dictionary, count)
