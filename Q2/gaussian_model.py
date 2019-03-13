@@ -12,7 +12,7 @@ def binary (X, Y, testX, testY):
     Train SVM with gaussian kernel
     """
     train (X, Y)
-    
+
     predictions = predict (X, Y, X, Y)
     accuracy = findAccuracy (predictions, Y)
     print ("Training Accuracy: ", accuracy)
@@ -22,11 +22,55 @@ def binary (X, Y, testX, testY):
     print ("Test Accuracy: ", accuracy)
 
 
+def multi (Data, testX, testY):
+    """
+    Train multi-clss SVM with gaussian kernel
+    """
+    tick = time.time()
+
+    testX = np.array(testX)
+    testY = np.array(testY)
+
+    for i in range (10):
+        for j in range (i+1, 10):
+            (X, Y) = Data[i][j]
+            modelfile = 'Q2/models/' + str(i) + '-' + str(j) + '.model'
+            train(X, Y, modelfile)
     
-def train (X, Y, gamma=0.05):
+    predictions = []
+    for i in range (10):
+        for j in range (i+1, 10):
+            def binaryFi (y):
+                if (y == 1):
+                    return i
+                else:
+                    return j
+            vf = np.vectorize(binaryFi)
+            (X, Y) = Data[i][j]
+            modelfile = 'Q2/models/' + str(i) + '-' + str(j) + '.model'
+            pred = predict (X, Y, testX, testY, modelfile)
+            predictions.append(vf(pred))
+
+    predictions = np.array(predictions)
+    print (predictions)
+
+    axis = 0
+    u, indices = np.unique(predictions, return_inverse=True)
+    finalPredictions = u[np.argmax(np.apply_along_axis(np.bincount, axis, indices.reshape(predictions.shape),
+                                None, np.max(indices) + 1), axis=axis)]
+
+    print (finalPredictions, u)
+    accuracy = np.sum(finalPredictions == testY) / len (testY)
+    print (accuracy, np.sum(finalPredictions == testY), len (testY))
+    print ("Time taken: ", time.time() - tick)
+
+
+    
+def train (X, Y, modelfile='Q2/models/gaussianBinary.model', gamma=0.05):
     """
     Train SVM with gaussian kernel
     """
+    tick = time.time()
     X = np.matrix(X)
     Y = np.matrix(Y).T
 
@@ -73,9 +117,10 @@ def train (X, Y, gamma=0.05):
 
     # Saving the model
     model = (alphas, b)
-    modelfile = 'gaussianBinary.pickle' 
     with open(modelfile, 'wb') as handle:
         pickle.dump(model, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    print ("Time taken for gaussian CVXOPT training: ", time.time() - tick)
 
 
 def gaussianKM (X, P, gamma):
@@ -97,7 +142,8 @@ def gaussianKM (X, P, gamma):
     KM = D1 + D2 - 2 * XPt
     return np.exp (-gamma * KM)
 
-def predict (X, Y, testX, testY, gamma=0.05):
+
+def predict (X, Y, testX, testY, modelfile='Q2/models/gaussianBinary.model', gamma=0.05):
     testX = np.matrix(testX)
     testY = np.matrix(testY)
     X = np.matrix(X)
@@ -105,9 +151,8 @@ def predict (X, Y, testX, testY, gamma=0.05):
     p, n = testX.shape
 
     # Load the model
-    modelfile = 'gaussianBinary.pickle'
     with open(modelfile, 'rb') as handle:
-            (alphas, b) = pickle.load(handle)
+        (alphas, b) = pickle.load(handle)
 
     AlphaY = np.multiply (alphas, Y)
     AlphaY = np.repeat(AlphaY, p, axis=1)
