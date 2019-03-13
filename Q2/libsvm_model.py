@@ -4,7 +4,6 @@ Code for training with the LIBSVM package
 
 import time
 import numpy as np
-import pickle
 from libsvm.python.svmutil import *
 
 def train (X, Y, kernel="linear", gamma=0.05):
@@ -56,6 +55,7 @@ def multi (Data, testX, testY):
     """
     Train nC2 models and do predictions
     """
+    tick = time.time()
 
     testX = np.array(testX)
     testY = np.array(testY)
@@ -92,3 +92,4 @@ def multi (Data, testX, testY):
     print (finalPredictions, u)
     accuracy = np.sum(finalPredictions == testY) / len (testY)
     print (accuracy, np.sum(finalPredictions == testY), len (testY))
+    print ("Time taken: ", time.time() - tick)

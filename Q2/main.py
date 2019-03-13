@@ -1,6 +1,7 @@
 import sys
 import libsvm_model
 import linear_model 
+import gaussian_model
 from read import get_data, filter_data
 
 if __name__ == '__main__':
@@ -27,6 +28,8 @@ if __name__ == '__main__':
 
         if (part == 'a'):
             linear_model.binary (X, Y, testX, testY)
+        elif (part == 'b'):
+            gaussian_model.binary (X, Y, testX, testY)
         elif (part == 'c'):
             # libsvm_model.binary (X, Y, testX, testY)
             libsvm_model.binary (X, Y, testX, testY, kernel="gaussian")
