@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
     else:
     # Multiclass classification
-        if (part == 'b'):
+        if (part == 'a' or part == 'b'):
             Data = []
             for i in range (10):
                 Data.append([])
@@ -48,7 +48,32 @@ if __name__ == '__main__':
                     Data[i][j] = (X, Y)
 
             testX, testY = filter_data (testData, filter=False)
-            libsvm_model.multi (Data, testX, testY)
+            if (part == 'b'):
+                libsvm_model.multi (Data, testX, testY)
+            else:
+                gaussian_model.multi (Data, testX, testY)
+        elif (part == 'c'):
+            testX, testY = filter_data (testData, filter=False)
+            libsvm_model.confusionMatrix (testY)
+        elif (part == 'd'):
+            trainSize = len(trainData) * 0.9 # Data already shuffled in read.py
+            print (len(trainData), trainSize)
+            valData = trainData[trainSize:]
+            trainData = trainData[:trainSize]
+            print (len(trainData), len(valData))
+            Data = []
+            for i in range (10):
+                Data.append([])
+                for j in range (10):
+                    Data[i].append(0)
+                for j in range (i+1, 10):
+                    X, Y = filter_data (trainData, classA=i, classB=j)
+                    Data[i][j] = (X, Y)
+
+            testX, testY = filter_data (testData, filter=False)
+            valX, valY = filter_data (valData, filter=False)
+            libsvm_model.validationC (Data, valX, valY, testX, testY)
+
         exit(0)
             
 

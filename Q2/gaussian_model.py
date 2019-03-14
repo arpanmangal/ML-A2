@@ -31,15 +31,15 @@ def multi (Data, testX, testY):
     testX = np.array(testX)
     testY = np.array(testY)
 
-    for i in range (10):
-        for j in range (i+1, 10):
+    for i in range (2):
+        for j in range (i+1, 3):
             (X, Y) = Data[i][j]
             modelfile = 'Q2/models/' + str(i) + '-' + str(j) + '.model'
             train(X, Y, modelfile)
     
     predictions = []
-    for i in range (10):
-        for j in range (i+1, 10):
+    for i in range (2):
+        for j in range (i+1, 3):
             def binaryFi (y):
                 if (y == 1):
                     return i
