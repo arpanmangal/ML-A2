@@ -56,7 +56,7 @@ if __name__ == '__main__':
             testX, testY = filter_data (testData, filter=False)
             libsvm_model.confusionMatrix (testY)
         elif (part == 'd'):
-            trainSize = len(trainData) * 0.9 # Data already shuffled in read.py
+            trainSize = int(len(trainData) * 0.9) # Data already shuffled in read.py
             print (len(trainData), trainSize)
             valData = trainData[trainSize:]
             trainData = trainData[:trainSize]

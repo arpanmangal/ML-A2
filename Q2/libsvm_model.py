@@ -23,6 +23,7 @@ def train (X, Y, kernel="linear", gamma=0.05, C=1):
         param.kernel_type = RBF
         param.gamma = gamma
     param.C = C
+    # param.H = 0
     model = svm_train(prob, param)
 
     print ("Time Taken (LIBSVM %s kernel): " % (kernel), time.time() - tick)
@@ -63,17 +64,17 @@ def multi (Data, testX, testY):
     testY = np.array(testY)
 
     Models = []
-    for i in range (2):
+    for i in range (10):
         Models.append([])
         for j in range (10):
             Models[i].append(0)
-        for j in range (i+1, 3):
+        for j in range (i+1, 10):
             (X, Y) = Data[i][j]
             Models[i][j] = train(X, Y, kernel="gaussian")
     
     predictions = []
-    for i in range (2):
-        for j in range (i+1, 3):
+    for i in range (10):
+        for j in range (i+1, 10):
             def binaryFi (y):
                 if (y == 1):
                     return i
@@ -115,9 +116,9 @@ def validationC (Data, valX, valY, testX, testY):
     """
 
     C = [1e-5, 1e-3, 1, 5, 10]
+    Accuracies = []
     print (C)
 
-    return
     tick = time.time()
 
     testX = np.array(testX)
@@ -127,18 +128,18 @@ def validationC (Data, valX, valY, testX, testY):
 
     for c in C:
         Models = []
-        for i in range (2):
+        for i in range (10):
             Models.append([])
             for j in range (10):
                 Models[i].append(0)
-            for j in range (i+1, 3):
+            for j in range (i+1, 10):
                 (X, Y) = Data[i][j]
                 Models[i][j] = train(X, Y, kernel="gaussian", C=c)
 
         def predictTest (testX, testY):
             predictions = []
-            for i in range (2):
-                for j in range (i+1, 3):
+            for i in range (10):
+                for j in range (i+1, 10):
                     def binaryFi (y):
                         if (y == 1):
                             return i
@@ -160,6 +161,11 @@ def validationC (Data, valX, valY, testX, testY):
             accuracy = np.sum(finalPredictions == testY) / len (testY)
             return accuracy
 
-        print ("C = %f | Val. Accuracy = %f | Test Accuracy = %f" % (c, predictTest(valX, valY), predictTest (testX, testY)))
+        valAccuracy = predictTest(valX, valY)
+        testAccuracy = predictTest (testX, testY)
+        Accuracies.append((valAccuracy, testAccuracy))
+
+    for idx, c in enumerate(C):
+        print ("C = %f | Val. Accuracy = %f | Test Accuracy = %f" % (c, Accuracies[idx][0], Accuracies[idx][1] ))
     
     print ("Time taken: ", time.time() - tick)

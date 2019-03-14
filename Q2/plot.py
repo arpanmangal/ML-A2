@@ -38,7 +38,8 @@ def plot_confusion_matrix(y_true, y_pred, classes,
 
     print(cm)
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(10, 8))
+    # plt.figure(figsize=(20,10))
     im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
     ax.figure.colorbar(im, ax=ax)
     # We want to show all ticks...
@@ -55,7 +56,7 @@ def plot_confusion_matrix(y_true, y_pred, classes,
              rotation_mode="anchor")
 
     # Loop over data dimensions and create text annotations.
-    fmt = '.2f' if normalize else 'd'
+    fmt = '.3f' if normalize else 'd'
     thresh = cm.max() / 2.
     for i in range(cm.shape[0]):
         for j in range(cm.shape[1]):
@@ -66,8 +67,8 @@ def plot_confusion_matrix(y_true, y_pred, classes,
     return ax
 
 
-def plotConfusionMatrix (predictions, Y, filename="Q2/confusion.png"):
-    np.set_printoptions(precision=2)
+def plotConfusionMatrix (predictions, Y):
+    np.set_printoptions(precision=3)
 
     # Plot non-normalized confusion matrix
     print (type(Y), Y.dtype, Y, type(predictions), predictions.dtype, predictions)
@@ -75,11 +76,11 @@ def plotConfusionMatrix (predictions, Y, filename="Q2/confusion.png"):
     # predictions.dtype = 'int64'
     plot_confusion_matrix(Y, predictions, classes=class_names,
                         title='Confusion matrix, without normalization')
-    plt.savefig(filename)
+    plt.savefig("Q2/plots/confusion.png")
 
     # Plot normalized confusion matrix
     plot_confusion_matrix(Y, predictions, classes=class_names, normalize=True,
                         title='Normalized confusion matrix')
-    plt.savefig(filename)
+    plt.savefig("Q2/plots/confusionNor.png", dpi=100)
 
     plt.show()
