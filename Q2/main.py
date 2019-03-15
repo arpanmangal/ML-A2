@@ -31,7 +31,7 @@ if __name__ == '__main__':
         elif (part == 'b'):
             gaussian_model.binary (X, Y, testX, testY)
         elif (part == 'c'):
-            # libsvm_model.binary (X, Y, testX, testY)
+            libsvm_model.binary (X, Y, testX, testY)
             libsvm_model.binary (X, Y, testX, testY, kernel="gaussian")
         exit(0)
 

@@ -87,6 +87,9 @@ def binary (X, Y, testX, testY):
         if (alp - 0 > epsilon and 1 - alp > epsilon):
             sv.append(alp)
     print ("Number of Support Vectors: ", len(sv))
+    with open('Q2/support-vectors/linear.vectors', 'w') as f:
+        for v in sv:
+            f.write("%.3f\n" % v)
 
 
     print ("Time taken: ", time.time() - tick)

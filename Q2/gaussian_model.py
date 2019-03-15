@@ -11,7 +11,7 @@ def binary (X, Y, testX, testY):
     """
     Train SVM with gaussian kernel
     """
-    train (X, Y)
+    train (X, Y, showProgress=True)
 
     predictions = predict (X, Y, X, Y)
     accuracy = findAccuracy (predictions, Y)
@@ -66,7 +66,7 @@ def multi (Data, testX, testY):
 
 
     
-def train (X, Y, modelfile='Q2/models/gaussianBinary.model', gamma=0.05):
+def train (X, Y, modelfile='Q2/models/gaussianBinary.model', gamma=0.05, showProgress=False):
     """
     Train SVM with gaussian kernel
     """
@@ -95,6 +95,7 @@ def train (X, Y, modelfile='Q2/models/gaussianBinary.model', gamma=0.05):
     h = cvx.matrix(h)
     A = cvx.matrix(A, (1, m), 'd')
     b = cvx.matrix(b, (1,1), 'd')
+    cvx.solvers.options['show_progress'] = showProgress
     sol = cvx.solvers.qp(P=Q, q=p, G=G, h=h, A=A, b=b)
 
     # Alphas
@@ -114,6 +115,18 @@ def train (X, Y, modelfile='Q2/models/gaussianBinary.model', gamma=0.05):
                 return b
     
     b = findBias ()
+
+    # Finding the support vectors
+    if (showProgress):
+        epsilon = 1e-5
+        sv = []
+        for idx, alp in enumerate(alphas):
+            if (alp - 0 > epsilon and 1 - alp > epsilon):
+                sv.append(alp)
+        with open('Q2/support-vectors/gaussian.vectors', 'w') as f:
+            for v in sv:
+                f.write("%.3f\n" % v)
+        print ("Number of Support Vectors: ", len(sv))
 
     # Saving the model
     model = (alphas, b)
