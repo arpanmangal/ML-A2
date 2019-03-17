@@ -6,10 +6,15 @@ Taken from docs: https://scikit-learn.org/stable/auto_examples/model_selection/p
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn import svm, datasets
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
-from sklearn.utils.multiclass import unique_labels
+def confusion_matrix (y_true, y_pred, class_names):
+    nC = len(class_names)
+    matrix = np.zeros((nC, nC))
+
+    for i, j in zip(y_true, y_pred):
+        matrix[i][j] += 1
+
+    return matrix
+
 
 class_names = [str(i) for i in range(10)]
 def plot_confusion_matrix(y_true, y_pred, classes,
@@ -27,13 +32,15 @@ def plot_confusion_matrix(y_true, y_pred, classes,
             title = 'Confusion matrix, without normalization'
 
     # Compute confusion matrix
-    cm = confusion_matrix(y_true, y_pred)
+    cm = confusion_matrix(y_true, y_pred, class_names)
+    print (cm)
     # Only use the labels that appear in the data
     # classes = classes[unique_labels(y_true, y_pred)]
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         print("Normalized confusion matrix")
     else:
+        cm = cm.astype('int')
         print('Confusion matrix, without normalization')
 
     print(cm)

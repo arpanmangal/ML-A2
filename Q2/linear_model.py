@@ -55,12 +55,10 @@ def binary (X, Y, testX, testY):
         epsilon = 1e-5
         for idx, alp in enumerate(alphas):
             if (alp - 0 > epsilon and 1 - alp > epsilon):
-                print (alp)
                 y = float (Y[idx])
                 w = np.matrix(W)
                 x = np.matrix(X[idx, :]).T
                 b = float (y - w*x)
-                print (y, w.shape, x.shape, b)
                 return b
         
     b = findB ()

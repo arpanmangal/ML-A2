@@ -57,10 +57,10 @@ if __name__ == '__main__':
             libsvm_model.confusionMatrix (testY)
         elif (part == 'd'):
             trainSize = int(len(trainData) * 0.9) # Data already shuffled in read.py
-            print (len(trainData), trainSize)
+            # print (len(trainData), trainSize)
             valData = trainData[trainSize:]
             trainData = trainData[:trainSize]
-            print (len(trainData), len(valData))
+            # print (len(trainData), len(valData))
             Data = []
             for i in range (10):
                 Data.append([])

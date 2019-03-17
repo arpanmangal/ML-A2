@@ -36,6 +36,9 @@ def multi (Data, testX, testY):
             (X, Y) = Data[i][j]
             modelfile = 'Q2/models/' + str(i) + '-' + str(j) + '.model'
             train(X, Y, modelfile)
+            predictions = predict (X, Y, X, Y, modelfile=modelfile)
+            accuracy = findAccuracy (predictions, Y)
+            print ("Training Accuracy: ", accuracy)
     
     predictions = []
     for i in range (2):
@@ -49,6 +52,8 @@ def multi (Data, testX, testY):
             (X, Y) = Data[i][j]
             modelfile = 'Q2/models/' + str(i) + '-' + str(j) + '.model'
             pred = predict (X, Y, testX, testY, modelfile)
+            accuracy = findAccuracy (pred, testY)
+            print ("Test Accuracy: ", accuracy)
             predictions.append(vf(pred))
 
     predictions = np.array(predictions)
@@ -127,6 +132,11 @@ def train (X, Y, modelfile='Q2/models/gaussianBinary.model', gamma=0.05, showPro
             for v in sv:
                 f.write("%.3f\n" % v)
         print ("Number of Support Vectors: ", len(sv))
+    # else:
+
+    epsilon = 1e-5
+    nSV = np.sum( (np.array(alphas) > epsilon) & (np.array(alphas) < 1 - epsilon), axis=0)
+    print ("Number of Support Vectors: ", nSV)
 
     # Saving the model
     model = (alphas, b)

@@ -71,6 +71,9 @@ def multi (Data, testX, testY):
         for j in range (i+1, 10):
             (X, Y) = Data[i][j]
             Models[i][j] = train(X, Y, kernel="gaussian")
+            predictions = predict (X, Y, Models[i][j])
+            trainAccuracy = findAccuracy (predictions, Y)
+            print ("Training Accuracy: ", trainAccuracy)
     
     predictions = []
     for i in range (10):
@@ -83,16 +86,18 @@ def multi (Data, testX, testY):
             vf = np.vectorize(binaryFi)
             pred = predict (testX, testY, Models[i][j])
             predictions.append(vf(pred))
+            testAccuracy = findAccuracy (pred, testY)
+            print ("Test Accuracy: ", testAccuracy)
 
     predictions = np.array(predictions)
-    print (predictions)
+    # print (predictions)
 
     axis = 0
     u, indices = np.unique(predictions, return_inverse=True)
     finalPredictions = u[np.argmax(np.apply_along_axis(np.bincount, axis, indices.reshape(predictions.shape),
                                 None, np.max(indices) + 1), axis=axis)]
 
-    print (finalPredictions, u)
+    # print (finalPredictions, u)
     predictionsFile = 'Q2/models/predictions45.pred'
     with open(predictionsFile, 'wb') as handle:
         pickle.dump(finalPredictions, handle, protocol=pickle.HIGHEST_PROTOCOL)
