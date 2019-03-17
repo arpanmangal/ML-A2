@@ -53,15 +53,11 @@ def json_reader(fname, count=1000, stemming=False, bigrams=False):
             continue
 
         review = np.array(word_tokenize(review))
-        # print ('review', stemming)
         if (not stemming):
-            # print ('stem')
             if bigrams:
-                print('bi')
                 if (len (review) < 3): # ignore it
                     continue
                 review = np.array(list(everygrams(review, 1, 2)))
-            # print ('yield')
             yield {'rating': rating, 'review': review}
         else:
             stopped_tokens = filter(lambda token: token not in en_stop, review)
@@ -88,17 +84,18 @@ def genVocab (trainset, vocabName, count=1000, size=100000, stemming=False, bigr
 
     # Applying min_df and max_df
     print (len(dictionary))
-    mins = []
-    maxs = []
+    # mins = []
+    # maxs = []
     for word, count in list(dictionary.items()):
-        if (count < 5):
-            mins.append(word)
+        if (count < 3):
+            # mins.append(word)
             dictionary.pop(word, None)
-        elif (count > 500):
-            maxs.append(word)
+        elif (count > 800):
+            # maxs.append(word)
             dictionary.pop(word, None)
 
-    print (len(mins), len(maxs), len(dictionary))
+    # print (len(mins), len(maxs), len(dictionary))
+    print (len(dictionary))
 
     # Applying max_features
     dictionary = sorted(dictionary, key=dictionary.get, reverse=True)[:size]
@@ -126,18 +123,18 @@ if __name__ == '__main__':
         print ("Go Away")
         exit(1)
 
-    count = 200000
+    count = 600000
     if (sys.argv[1] == 'u'):
         # All Unigrams without stemming
-        genVocab (sys.argv[2], 'Q1/vocabs/unigramVocab.pickle', count=count, size=200000)
+        genVocab (sys.argv[2], 'Q1/vocabs/unigramVocab.pickle', count=count, size=250000)
     elif (sys.argv[1] == 's'):
         # All Unigrams with stemming
-        genVocab (sys.argv[2], 'Q1/vocabs/stemmedVocab.pickle', count=count, size=200000, stemming=True)
+        genVocab (sys.argv[2], 'Q1/vocabs/stemmedVocab.pickle', count=count, size=250000, stemming=True)
     elif (sys.argv[1] == 'ub'):
         # All Bigrams
-        genVocab (sys.argv[2], 'Q1/vocabs/bigramVocab.pickle', count=count, size=200000, bigrams=True)
+        genVocab (sys.argv[2], 'Q1/vocabs/bigramVocab.pickle', count=count, size=250000, bigrams=True)
     elif (sys.argv[1] == 'sb'):
         # All Bigrams with stemming
-        genVocab (sys.argv[2], 'Q1/vocabs/stemmedVocab.pickle', count=count, size=200000, stemming=True)
+        genVocab (sys.argv[2], 'Q1/vocabs/stemmedBiVocab.pickle', count=count, size=250000, stemming=True, bigrams=True)
     else:
         print ("Go Away")

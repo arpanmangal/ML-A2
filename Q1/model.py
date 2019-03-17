@@ -95,7 +95,7 @@ if __name__ == '__main__':
     trainset = sys.argv[1]
     testset = sys.argv[2]
     part = sys.argv[3]
-    count = 2000 # Upper limit on number of examples to consider
+    count = 600000 # Upper limit on number of examples to consider
 
     if (part == 'a'):
         # Implement NB on smaller data
@@ -122,7 +122,7 @@ if __name__ == '__main__':
 
     if (part == 'd'):
         # Implement NB on smaller data
-        dictionary = loadVocab('stemmedVocab.pickle')
+        dictionary = loadVocab('Q1/vocabs/stemmedVocab.pickle')
         # PHI = computePHI(trainset, count)
         PHI, THETA = computeParameters (trainset, dictionary, count, True)
         actualPredictions(PHI, THETA, trainset, dictionary, count, accuracyLabel="Training Accuracy: ")
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     if (part == 'f'):
         # Report F1-scores
         dictionary = loadVocab('Q1/vocabs/unigramVocab.pickle')
-        (PHI, THETA) = saveAndLoadModel (1)
+        (PHI, THETA) = saveAndLoadModel (1, modelName='Q1/models/NBsimple.pickle')
         F1scores (PHI, THETA, testset, dictionary, count)
         exit(0)
 
