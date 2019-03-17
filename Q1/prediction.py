@@ -34,9 +34,10 @@ def actualPredictions (Phi, Theta, testset, dictionary, count=1000, accuracyLabe
     for data in json_reader(testset, count):
         prediction = predictClass (Phi, Theta, dictionary, data['review'])
         totalPredictions += 1
+        # print (prediction, end=' ')
         if (prediction == data['rating']):
             correctPredictions += 1
-        
+    # print()
     print (totalPredictions)
     print (accuracyLabel, "%.2f%%" % (correctPredictions * 100 / totalPredictions))
     print ("Time Taken: ", time.time() - tick)

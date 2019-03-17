@@ -11,58 +11,64 @@ from preprocessing import json_reader, loadVocab
 from prediction import actualPredictions, randomPredictions, majorityPrediction, F1scores
 from plot import plotConfusionMatrix
 
-def computePHI (trainset, count=1000):
-    """
-    Computing PHI_k = P (y = k)
-    """
-    Phi = np.zeros(5)
-    tick = time.time()
+# def computePHI (trainset, count=1000):
+#     """
+#     Computing PHI_k = P (y = k)
+#     """
+#     Phi = np.zeros(5)
+#     tick = time.time()
 
-    totalRatings = 0
-    for data in json_reader(trainset, count):
-        totalRatings += 1
-        Phi[data['rating'] - 1] += 1
+#     totalRatings = 0
+#     for data in json_reader(trainset, count):
+#         totalRatings += 1
+#         Phi[data['rating'] - 1] += 1
         
-    Phi = np.log(Phi / totalRatings)
-    print ("PHI -- Time Taken: ", time.time() - tick)
-    return Phi
+#     Phi = np.log(Phi / totalRatings)
+#     print ("PHI -- Time Taken: ", time.time() - tick)
+#     return Phi
 
 
-def computeTHETA (trainset, dictionary, count=1000, stemming=False):
+def computeParameters (trainset, dictionary, count=1000, stemming=False, bigrams=False):
     # Computing ThetaWK's
     V = len(dictionary)
     print (V)
 
     tick = time.time()
 
+    Phi = np.zeros(5)
     ThetaNum = np.zeros((V, 5)) + 1
-    ThetaDeno = np.zeros((V, 5)) + V 
-
+    ThetaDeno = np.zeros(5) + V
+    totalRatings = [0]
+    
     def computeFreq (doc, rating):
+        totalRatings[0] += 1
+
         k = rating - 1
-        ThetaDeno[:, k] += len(doc)
+        Phi[k] += 1
+
+        Deno = len(doc)
         
         for word in doc:
             if (word not in dictionary):
-                ThetaDeno[:, k] -= 1
+                Deno -= 1
                 continue
             w = dictionary[word]
             ThetaNum[w][k] += 1
+
+        ThetaDeno[k] += Deno
         
         return 0
         
-    for data in json_reader(trainset, count, stemming=stemming):
+    for data in json_reader(trainset, count, stemming=stemming, bigrams=bigrams):
         computeFreq (data['review'], data['rating'])
         
+    Phi = np.log(Phi / totalRatings[0])
     Theta = np.log(ThetaNum / ThetaDeno)
 
     np.set_printoptions(precision=2)
-    # print (ThetaNum)
-    # print (ThetaDeno)
-    # print (Theta)
 
-    print ("THETA -- Time Taken: ", time.time() - tick)
-    return Theta
+    print ("Parameters -- Time Taken: ", time.time() - tick)
+    return Phi, Theta
 
 
 def saveAndLoadModel (mode, PHI=None, THETA=None, modelName='Q1/models/NBmodel.pickle'):
@@ -93,9 +99,9 @@ if __name__ == '__main__':
 
     if (part == 'a'):
         # Implement NB on smaller data
-        dictionary = loadVocab('unigramVocab.pickle')
-        PHI = computePHI(trainset, count)
-        THETA = computeTHETA (trainset, dictionary, count, False)
+        dictionary = loadVocab('Q1/vocabs/unigramVocab.pickle')
+        # PHI = computePHI(trainset, count)
+        PHI, THETA = computeParameters (trainset, dictionary, count, False)
         actualPredictions(PHI, THETA, trainset, dictionary, count, accuracyLabel="Training Accuracy: ")
         actualPredictions(PHI, THETA, testset, dictionary, count, accuracyLabel="Test Accuracy: ")
         saveAndLoadModel (0, PHI, THETA, modelName='Q1/models/NBsimple.pickle')
@@ -109,7 +115,7 @@ if __name__ == '__main__':
 
     if (part == 'c'):
         # Plot the confusion matrix
-        dictionary = loadVocab('unigramVocab.pickle')
+        dictionary = loadVocab('Q1/vocabs/unigramVocab.pickle')
         (PHI, THETA) = saveAndLoadModel (1, modelName='Q1/models/NBsimple.pickle')
         plotConfusionMatrix (PHI, THETA, testset, dictionary, count)
         exit(0)
@@ -117,15 +123,28 @@ if __name__ == '__main__':
     if (part == 'd'):
         # Implement NB on smaller data
         dictionary = loadVocab('stemmedVocab.pickle')
-        PHI = computePHI(trainset, count)
-        THETA = computeTHETA (trainset, dictionary, count, True)
+        # PHI = computePHI(trainset, count)
+        PHI, THETA = computeParameters (trainset, dictionary, count, True)
         actualPredictions(PHI, THETA, trainset, dictionary, count, accuracyLabel="Training Accuracy: ")
         actualPredictions(PHI, THETA, testset, dictionary, count, accuracyLabel="Test Accuracy: ")
         saveAndLoadModel (0, PHI, THETA, modelName='Q1/models/NBstemmed.pickle')
         exit (0)
 
+    if (part == 'e'):
+        # Implement NB on smaller data
+        dictionary = loadVocab('Q1/vocabs/bigramVocab.pickle')
+        # PHI = computePHI(trainset, count)
+        PHI, THETA = computeParameters (trainset, dictionary, count, False, bigrams=True)
+        actualPredictions(PHI, THETA, trainset, dictionary, count, accuracyLabel="Training Accuracy: ")
+        actualPredictions(PHI, THETA, testset, dictionary, count, accuracyLabel="Test Accuracy: ")
+        saveAndLoadModel (0, PHI, THETA, modelName='Q1/models/NBfeature.pickle')
+        exit (0)
+
     if (part == 'f'):
         # Report F1-scores
-        dictionary = loadVocab('unigramVocab.pickle')
+        dictionary = loadVocab('Q1/vocabs/unigramVocab.pickle')
         (PHI, THETA) = saveAndLoadModel (1)
         F1scores (PHI, THETA, testset, dictionary, count)
+        exit(0)
+
+    print("Go Away")

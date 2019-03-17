@@ -71,11 +71,11 @@ def plotConfusionMatrix (Phi, Theta, testset, dictionary, count=1000):
     # Plot non-normalized confusion matrix
     plot_confusion_matrix(ratings, predictions, classes=class_names,
                         title='Confusion matrix, without normalization')
-    plt.savefig('Q1/NBconfusionMatrix.png')
+    plt.savefig('Q1/plots/NBconfusionMatrix.png')
 
     # Plot normalized confusion matrix
     plot_confusion_matrix(ratings, predictions, classes=class_names, normalize=True,
                         title='Normalized confusion matrix')
 
-    plt.savefig('Q1/NBconfusionMatrixNormalised.png')
+    plt.savefig('Q1/plots/NBconfusionMatrixNormalised.png')
     plt.show()
